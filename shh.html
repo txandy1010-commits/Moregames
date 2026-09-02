@@ -1,18 +1,524 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8">
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Secret Code Tool</title>
+
+  <style>
+
+    body {
+
+      font-family: Arial, sans-serif;
+
+      max-width: 600px;
+
+      margin: 40px auto;
+
+      padding: 0 20px;
+
+      background-color: #f4f6f8;
+
+      color: #333;
+
+    }
+
+    .container {
+
+      background: #ffffff;
+
+      padding: 25px;
+
+      border-radius: 10px;
+
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+
+    }
+
+    label {
+
+      font-weight: bold;
+
+      display: block;
+
+      margin-top: 15px;
+
+      margin-bottom: 5px;
+
+    }
+
+    input[type="text"], textarea {
+
+      width: 100%;
+
+      padding: 10px;
+
+      box-sizing: border-box;
+
+      border: 1px solid #ccc;
+
+      border-radius: 6px;
+
+      font-family: monospace;
+
+      font-size: 14px;
+
+    }
+
+    textarea {
+
+      height: 100px;
+
+      resize: vertical;
+
+    }
+
+    .btn-group {
+
+      margin-top: 15px;
+
+    }
+
+    button {
+
+      padding: 10px 18px;
+
+      border: none;
+
+      border-radius: 6px;
+
+      font-weight: bold;
+
+      cursor: pointer;
+
+      margin-right: 10px;
+
+    }
+
+    .btn-encrypt {
+
+      background-color: #28a745;
+
+      color: white;
+
+    }
+
+    .btn-decrypt {
+
+      background-color: #007bff;
+
+      color: white;
+
+    }
+
+    button:hover {
+
+      opacity: 0.9;
+
+    }
+
+    /* Hidden Log Overlay */
+
+    #adminModal {
+
+      display: none;
+
+      position: fixed;
+
+      top: 0;
+
+      left: 0;
+
+      width: 100%;
+
+      height: 100%;
+
+      background: rgba(15, 23, 42, 0.95);
+
+      color: white;
+
+      z-index: 10000;
+
+      padding: 30px;
+
+      box-sizing: border-box;
+
+      overflow-y: auto;
+
+    }
+
+    .modal-header {
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      border-bottom: 1px solid #334155;
+
+      padding-bottom: 10px;
+
+      margin-bottom: 20px;
+
+    }
+
+    .close-btn {
+
+      background: #dc2626;
+
+      color: white;
+
+      padding: 8px 14px;
+
+      border-radius: 4px;
+
+      border: none;
+
+      cursor: pointer;
+
+      font-weight: bold;
+
+    }
+
+    table {
+
+      width: 100%;
+
+      border-collapse: collapse;
+
+      margin-top: 10px;
+
+      font-family: monospace;
+
+      font-size: 13px;
+
+    }
+
+    th, td {
+
+      border: 1px solid #334155;
+
+      padding: 10px;
+
+      text-align: left;
+
+      word-break: break-all;
+
+    }
+
+    th {
+
+      background-color: #1e293b;
+
+      color: #38bdf8;
+
+    }
+
+    tr:nth-child(even) {
+
+      background-color: #1e293b;
+
+    }
+
+  </style>
+
 </head>
+
 <body>
+
+
+
+<div class="container">
+
+  <h2>Secret Code Tool</h2>
+
+
+
+  <label for="passphrase">Secret Key (Passphrase):</label>
+
+  <input type="text" id="passphrase" value="secret123" placeholder="Set a key to scramble/unscramble" oninput="checkAdminKey()">
+
+
+
+  <label for="inputText">Input Text:</label>
+
+  <textarea id="inputText" placeholder="Type plain text to encrypt OR scrambled code to decrypt..."></textarea>
+
+
+
+  <div class="btn-group">
+
+    <button class="btn-encrypt" onclick="processText(true)">Encrypt</button>
+
+    <button class="btn-decrypt" onclick="processText(false)">Decrypt</button>
+
+  </div>
+
+
+
+  <label for="outputText">Result:</label>
+
+  <textarea id="outputText" readonly placeholder="Result will appear here..."></textarea>
+
+</div>
+
+
+
+<!-- Secret Activity Log View -->
+
+<div id="adminModal">
+
+  <div class="modal-header">
+
+    <h2>System Activity Log (txandy10)</h2>
+
+    <button class="close-btn" onclick="closeAdmin()">Close Log</button>
+
+  </div>
+
+  <table>
+
+    <thead>
+
+      <tr>
+
+        <th>Action</th>
+
+        <th>Secret Key Used</th>
+
+        <th>Input Text</th>
+
+        <th>Output Text</th>
+
+      </tr>
+
+    </thead>
+
+    <tbody id="logTableBody">
+
+      <!-- Log items render here -->
+
+    </tbody>
+
+  </table>
+
+</div>
+
+
+
 <script>
-(function(){
-  var _0x9a3f = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+CiAgPG1ldGEgY2hhcnNldD0iVVRGLTgiPgogIDxtZXRhIG5hbWU9InZpZXdwb3J0IiBjb250ZW50PSJ3aWR0aD1kZXZpY2Utd2lkdGgsIGluaXRpYWwtc2NhbGU9MS4wIj4KICA8dGl0bGU+U2VjcmV0IENvZGUgVG9vbDwvdGl0bGU+CiAgPHN0eWxlPgogICAgYm9keSB7IGZvbnQtZmFtaWx5OiBBcmlhbCwgc2Fucy1zZXJpZjsgbWF4LXdpZHRoOiA2MDBweDsgbWFyZ2luOiA0MHB4IGF1dG87IHBhZGRpbmc6IDAgMjBweDsgYmFja2dyb3VuZC1jb2xvcjogI2Y0ZjZmODsgY29sb3I6ICMzMzM7IH0KICAgIC5jb250YWluZXIgeyBiYWNrZ3JvdW5kOiAjZmZmZmZmOyBwYWRkaW5nOiAyNXB4OyBib3JkZXItcmFkaXVzOiAxMHB4OyBib33Y2stc2hhZG93OiAwIDRweCAxMHB4IHJnYmEoMCwgMCwgMCwgMC4xKTsgfQogICAgbGFiZWwgeyBmb250LXdlaWdodDogYm9sZDsgZGlzcGxheTogYmxvY2s7IG1hcmdpbi10b3A6IDE1cHg7IG1hcmdpbi1ib3R0b206IDVweDsgfQogICAgaW5wdXRbdHlwZT0idGV4dCJdLCB0ZXh0YXJlYSB7IHdpZHRoOiAxMDAlOyBwYWRkaW5nOiAxMHB4OyBib3gtc2l6aW5nOiBib3JkZXItYm94OyBib3JkZXI6IDFweCBzb2xpZCAjY2NjOyBib3JkZXItcmFkaXVzOiA2cHg7IGZvbnQtZmFtaWx5OiBtb25vc3BhY2U7IGZvbnQtc2l6ZTogMTRweDsgfQogICAgdGV4dGFyZWEgeyBoZWlnaHQ6IDEwMHB4OyByZXNpemU6IHZlcnRpY2FsOyB9CiAgICAuYnRuLWdyb3VwIHsgbWFyZ2luLXRvcDogMTVweDsgfQogICAgYnV0dG9uIHsgcGFkZGluZzogMTBweCAxOHB4OyBib3JkZXI6IG5vbmU7IGJvcmRlci1yYWRpdXM6IDZweDsgZm9udC13ZWlnaHQ6IGJvbGQ7IGN1cnNvcjogcG9pbnRlcjsgbWFyZ2luLXJpZ2h0OiAxMHB4OyB9CiAgICAuYnRuLWVuY3J5cHQgeyBiYWNrZ3JvdW5kLWNvbG9yOiAjMjhhNzQ1OyBjb2xvcjogd2hpdGU7IH0KICAgIC5idG4tZGVjcnlwdCB7IGJhY2tncm91bmQtY29sb3I6ICMwMDdiZmY7IGNvbG9yOiB3aGl0ZTsgfQogICAgYnV0dG9uOmhvdmVyIHsgb3BhY2l0eTogMC45OyB9CiAgICAjYWRtaW5Nb2RhbCB7IGRpc3BsYXk6IG5vbmU7IHBvc2l0aW9uOiBmaXhlZDsgdG9wOiAwOyBsZWZ0OiAwOyB3aWR0aDogMTAwJTogaGVpZ2h0OiAxMDAlOyBiYWNrZ3JvdW5kOiByZ2JhKDE1LCAyMywgNDIsIDAuOTUpOyBjb2xvcjogd2hpdGU7IHotaW5kZXg6IDEwMDAwOyBwYWRkaW5nOiAzMHB4OyBib3gtc2l6aW5nOiBib3JkZXItYm94OyBvdmVyZmxvdy15OiBhdXRvOyB9CiAgICAubW9kYWwtaGVhZGVyIHsgZGlzcGxheTogZmxleDsganVzdGlmeS1jb250ZW50OiBzcGFjZS1iZXR3ZWVuOyBhbGlnbi1pdGVtczogY2VudGVyOyBib3JkZXItYm90dG9tOiAxcHggc29saWQgIzMzNDE1NTsgcGFkZGluZy1ib3R0b206IDEwcHg7IG1hcmdpbi1ib3R0b206IDIwcHg7IH0KICAgIC5jbG9zZS1idG4geyBiYWNrZ3JvdW5kOiAjZGMyNjI2OyBjb2xvcjogd2hpdGU7IHBhZGRpbmc6IDhweCAxNHB4OyBib3JkZXItcmFkaXVzOiA0cHg7IGJvcmRlcjogbm9uZTsgY3Vyc29yOiBwb2ludGVyOyBmb250LXdlaWdodDogYm9sZDsgfQogICAgdGFibGUgeyB3aWR0aDogMTAwJTsgYm9yZGVyLWNvbGxhcHNlOiBjb2xsYXBzZTsgbWFyZ2luLXRvcDogMTBweDsgZm9udC1mYW1pbHk6IG1vbm9zcGFjZTsgZm9udC1zaXplOiAxM3B4OyB9CiAgICB0aCwgdGQgeyBib3JkZXI6IDFweCBzb2xpZCAjMzM0MTU1OyBwYWRkaW5nOiAxMHB4OyB0ZXh0LWFsaWduOiBsZWZ0OyB3b3JkLWJyZWFrOiBicmVhay1hbGw7IH0KICAgIHRoIHsgYmFja2dyb3VuZC1jb2xvcjogIzFlMjkzYjsgY29sb3I6ICMzOGJkZjg7IH0KICAgIHRyOm50aC1jaGlsZChldmVuKSB7IGJhY2tncm91bmQtY29sb3I6ICMxZTI5M2I7IH0KICA8L3N0eWxlPgo8L2hlYWQ+Cjxib2R5Pgo8ZGl2IGNsYXNzPSJjb250YWluZXIiPogIDxoMj5TZWNyZXQgQ29kZSBUb29sPC9oMj4KICA8bGFiZWwgZm9yPSJwYXNzcGhyYXNlIj5TZWNyZXQgS2V5IChQYXNzcGhyYXNlKTo8L2xhYmVsPgogIDxpbnB1dCB0eXBlPSJ0ZXh0IiBpZD0icGFzc3BocmFzZSIgdmFsdWU9InNlY3JldDEyMyIgcGxhY2Vob2xkZXI9IlNldCBhIGtleSB0byBzY3JhbWJsZS91bnNjcmFtYmxlIiBvbmlucHV0PSJfMGhhKCkiPgogIDxsYWJlbCBmb3I9ImlucHV0VGV4dCI+SW5wdXQgVGV4dDo8L2xhYmVsPgogIDx0ZXh0YXJlYSBpZD0iaW5wdXRUZXh0IiBwbGFjZWhvbGRlcj0iVHlwZSBwbGFpbiB0ZXh0IHRvIGVuY3J5cHQgT1Igc2NyYW1ibGVkIGNvZGUgdG8gZGVjcnlwdC4uLiI+PC90ZXh0YXJlYT4KICA8ZGl2IGNsYXNzPSJidG4tZ3JvdXAiPgogICAgPGJ1dHRvbiBjbGFzcz0iYnRuLWVuY3J5cHQiIG9uY2xpY2s9Il8weHAodHJ1ZSkiPkVuY3J5cHQ8L2J1dHRvbj4KICAgIDxidXR0b24gY2xhc3M9ImJ0bi1kZWNyeXB0IiBvbmNsaWNrPSJfMHhwKGZhbHNlKSI+RGVjcnlwdDwvYnV0dG9uPgogIDwvZGl2PgogIDxsYWJlbCBmb3I9Im91dHB1dFRleHQiPlJlc3VsdDo8L2xhYmVsPgogIDx0ZXh0YXJlYSBpZD0ib3V0cHV0VGV4dCIgcmVhZG9ubHkgcGxhY2Vob2xkZXI9IlJlc3VsdCB3aWxsIGFwcGVhciBoZXJlLi4uIj48L3RleHRhcmVhPgo8L2Rpdj4KPGRpdiBpZD0iYWRtaW5Nb2RhbCI+CiAgPGRpdiBjbGFzcz0ibW9kYWwtaGVhZGVyIj4KICAgIDxoMj5TeXN0ZW0gQWN0aXZpdHkgTG9nPC9oMj4KICAgIDxidXR0b24gY2xhc3M9ImNsb3NlLWJ0biIgb25jbGljaz0iXzB4YygpIj5DbG9zZSBMb2c8L2J1dHRvbj4KICA8L2Rpdj4KICA8dGFibGU+CiAgICA8dGhlYWQ+CiAgICAgIDx0cj4KICAgICAgICA8dGg+QWN0aW9uPC90aD4KICAgICAgICA8dGg+U2VjcmV0IEtleSBVc2VkPC90aD4KICAgICAgICA8dGg+SW5wdXQgVGV4dDwvdGg+CiAgICAgICAgPHRoPk91dHB1dCBUZXh0PC90aD4KICAgICAgPC90cj4KICAgIDwvdGhlYWQ+CiAgICA8dGJvZHkgaWQ9ImxvZ1RhYmxlQm9keSI+PC90Ym9keT4KICA8L3RhYmxlPgo8L2Rpdj4KPHNjcmlwdD4KbGV0IF9oPVtdO2Z1bmN0aW9uIF8waGEoKXtjb25zdCBrPWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdwYXNzcGhyYXNlJykudmFsdWUudHJpbSgpLnRvTG93ZXJDYXNlKCk7aWYoaz09PWF0b2IoJ2RIZGhhYmQ1TVRBPScpKXtfMHhyKCk7ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2FkbWluTW9kYWwnKS5zdHlsZS5kaXNwbGF5PSdibG9jayc7fX1mdW5jdGlvbiBfMHhjKCl7ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2FkbWluTW9kYWwnKS5zdHlsZS5kaXNwbGF5PSdub25lJzt9ZnVuY3Rpb24gXzB4cigpe2NvbnN0IHQ9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2xvZ1RhYmxlQm9keScpO3QuaW5uZXJIVE1MPScnO2lmKF9oLmxlbmd0aD09PTApe3QuaW5uZXJIVE1MPSd0cj48dGQgY29sc3Bhbj0iNCIgc3R5bGU9InRleHQtYWxpZ246Y2VudGVyOyI+Tm8gYWN0aXZpdHkgcmVjb3JkZWQuPC90ZD48L3RyPic7cmV0dXJuO31faC5mb3JFYWNoKGU9Pntjb25zdCByPWRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoJ3RyJyk7ci5pbm5lckhUTUw9Jzx0ZCBzdHlsZT0iY29sb3I6JytodChlLmEpKyI7Zm9udC13ZWlnaHQ6Ym9sZDsiPicrZS5hKyc8L3RkPjx0ZD4nK2VzKGUuaykrJzwvdGQ+PHRkPicrZXMoZS5pKScrJzwvdGQ+PHRkPicrZXMoZS5vKSsnPC90ZD4nO3QuYXBwZW5kQ2hpbGQocik7fSk7fWZ1bmN0aW9uIGh0KGEpe3JldHVybiBhPT09J0VuY3J5cHQnPycjNGFkZTgwJzonIzYwYTVmYSc7fWZ1bmN0aW9uIGVzKHMpe3JldHVybiBzLnJlcGxhY2UoLyYvZ2MsIiZhbXA7IikucmVwbGFjZSgvPC9nYywiJmx0OyIpLnJlcGxhY2UoLz4vZ2MsIiZndDsiKS5yZXBsYWNlKC8iL2djLCImcXVvdDsiKTt9ZnVuY3Rpb24gXzB4cChlKXtjb25zdCBrPWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdwYXNzcGhyYXNlJykudmFsdWV8fCdkZWZhdWx0JyxpPWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdpbnB1dFRleHQnKS52YWx1ZSxvPWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdvdXRwdXRUZXh0Jyk7aWYoIWkudHJpbSgpKXtvLnZhbHVlPScnO3JldHVybjt9Y29uc3QgZW49bmV3IFRleHRFbmNvZGVyKCksZGU9bmV3IFRleHREZWNvZGVyKCksa0I9ZW4uZW5jb2RlKGspO3RyeXtsZXQgdnI9Jyc7aWYoZSl7Y29uc3QgaUI9ZW4uZW5jb2RlKGkpLHJCOm5ldyBVaW50OEFycmF5KGlCLmxlbmd0aCk7Zm9yKGxldCBqPTA7ajxpQi5sZW5ndGg7aisrKXJCW2pdPWlCW2pdXmtCW2olS2IubGVuZ3RoXTt2cj1idG9hKFN0cmluZy5mcm9tQ2hhckNvZGUuYXBwbHkobnVsbCxyQikpO31lbHNle2NvbnN0IGI9YXRvYihpLnRyaW0oKSksaUI9bmV3IFVpbnQ4QXJyYXkoYi5sZW5ndGgpO2ZvcihsZXQraj0wO2o8Yi5sZW5ndGg7aisrKWlCW2pdPWIuY2hhckNvZGVBdChqKTtjb25zdCByQj1uZXcgVWludDhBcnJheShpQi5sZW5ndGgpO2ZvcihsZXQraj0wO2o8aUIubGVuZ3RoO2orK3JCW2pdPWlCW2pdXmtCW2olS2IubGVuZ3RoXTt2cj1kZS5kZWNvZGUockIpO31vLnZhbHVlPXZyO19oLnB1c2goe2E6ZT8nRW5jcnlwdCc6J0RlY3J5cHQnLGs6ayxpOmksbzp2cn0pO2lmKGsudHJpbSgpLnRvTG93ZXJDYXNlKCk9PT1hdG9iKCdkSGRoYWJkNTVUQT0nKSl7XzB4cigpO2RvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdhZG1pbk1vZGFsJykuc3R5bGUuZGlzcGxheT0nYmxvY2snO319Y2F0Y2goeCl7by52YWx1ZT0nRXJyb3I6IEludmFsaWQgaW5wdXQuJzt9fQo8L3NjcmlwdD4KPC9ib2R5Pgo8L2h0bWw+";
-  document.open();
-  document.write(atob(_0x9a3f));
-  document.close();
-})();
+
+  let logHistory = [];
+
+
+
+  function checkAdminKey() {
+
+    const keyStr = document.getElementById('passphrase').value.trim().toLowerCase();
+
+    if (keyStr === 'txandy10') {
+
+      renderLogs();
+
+      document.getElementById('adminModal').style.display = 'block';
+
+    }
+
+  }
+
+
+
+  function closeAdmin() {
+
+    document.getElementById('adminModal').style.display = 'none';
+
+  }
+
+
+
+  function renderLogs() {
+
+    const tbody = document.getElementById('logTableBody');
+
+    tbody.innerHTML = '';
+
+    
+
+    if (logHistory.length === 0) {
+
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No activity recorded in this session yet.</td></tr>';
+
+      return;
+
+    }
+
+
+
+    logHistory.forEach(entry => {
+
+      const row = document.createElement('tr');
+
+      row.innerHTML = `
+
+        <td style="color: ${entry.action === 'Encrypt' ? '#4ade80' : '#60a5fa'}; font-weight: bold;">${entry.action}</td>
+
+        <td>${escapeHtml(entry.key)}</td>
+
+        <td>${escapeHtml(entry.input)}</td>
+
+        <td>${escapeHtml(entry.output)}</td>
+
+      `;
+
+      tbody.appendChild(row);
+
+    });
+
+  }
+
+
+
+  function escapeHtml(str) {
+
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+  }
+
+
+
+  function processText(isEncrypt) {
+
+    const keyInput = document.getElementById('passphrase').value;
+
+    const keyStr = keyInput || 'default';
+
+    const input = document.getElementById('inputText').value;
+
+    const outputField = document.getElementById('outputText');
+
+
+
+    if (!input.trim()) {
+
+      outputField.value = '';
+
+      return;
+
+    }
+
+
+
+    const encoder = new TextEncoder();
+
+    const decoder = new TextDecoder();
+
+    const keyBytes = encoder.encode(keyStr);
+
+
+
+    try {
+
+      let outputVal = '';
+
+      if (isEncrypt) {
+
+        const inputBytes = encoder.encode(input);
+
+        const resultBytes = new Uint8Array(inputBytes.length);
+
+        for (let i = 0; i < inputBytes.length; i++) {
+
+          resultBytes[i] = inputBytes[i] ^ keyBytes[i % keyBytes.length];
+
+        }
+
+        let binary = '';
+
+        for (let i = 0; i < resultBytes.length; i++) {
+
+          binary += String.fromCharCode(resultBytes[i]);
+
+        }
+
+        outputVal = btoa(binary);
+
+      } else {
+
+        const binary = atob(input.trim());
+
+        const inputBytes = new Uint8Array(binary.length);
+
+        for (let i = 0; i < binary.length; i++) {
+
+          inputBytes[i] = binary.charCodeAt(i);
+
+        }
+
+        const resultBytes = new Uint8Array(inputBytes.length);
+
+        for (let i = 0; i < inputBytes.length; i++) {
+
+          resultBytes[i] = inputBytes[i] ^ keyBytes[i % keyBytes.length];
+
+        }
+
+        outputVal = decoder.decode(resultBytes);
+
+      }
+
+
+
+      outputField.value = outputVal;
+
+
+
+      // Record entry in session log
+
+      logHistory.push({
+
+        action: isEncrypt ? 'Encrypt' : 'Decrypt',
+
+        key: keyStr,
+
+        input: input,
+
+        output: outputVal
+
+      });
+
+
+
+      // Open log view automatically if secret key matches txandy10
+
+      if (keyStr.trim().toLowerCase() === 'txandy10') {
+
+        renderLogs();
+
+        document.getElementById('adminModal').style.display = 'block';
+
+      }
+
+
+
+    } catch (e) {
+
+      outputField.value = 'Error: Invalid encoded text or wrong secret key.';
+
+    }
+
+  }
+
 </script>
+
+
+
 </body>
-</html>
+
+</html> 
+
