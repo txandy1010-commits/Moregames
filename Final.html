@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Games</title>
+    <style>
+        :root {
+            --bg-color: #0d47a1;          /* Ruffle Dark Blue */
+            --card-bg: #1565c0;        /* Card Blue */
+            --header-bg: #0a2472;      /* Header Dark Blue */
+            --ruffle-yellow: #ffea00;  /* Ruffle Accent Yellow */
+            --ruffle-yellow-hover: #ffd600;
+            --border-color: #ffea00;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--ruffle-yellow);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--header-bg);
+            border-bottom: 3px solid var(--ruffle-yellow);
+            padding: 1.5rem 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: var(--ruffle-yellow);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 800;
+            text-shadow: 1px 1px 0px #000;
+        }
+
+        .search-container {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            border: 2px solid var(--border-color);
+            background-color: var(--card-bg);
+            color: var(--ruffle-yellow);
+            font-size: 1rem;
+            font-weight: bold;
+            outline: none;
+        }
+
+        #searchInput::placeholder {
+            color: #fff59d;
+            opacity: 0.7;
+        }
+
+        #searchInput:focus {
+            box-shadow: 0 0 8px var(--ruffle-yellow);
+        }
+
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 12px rgba(255, 234, 0, 0.3);
+        }
+
+        .game-logo {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            background-color: var(--header-bg);
+            border: 1px solid var(--ruffle-yellow);
+            padding: 0.4rem;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: var(--ruffle-yellow);
+            word-break: break-word;
+        }
+
+        .btn {
+            width: 100%;
+            background-color: var(--ruffle-yellow);
+            color: #0a2472;
+            font-weight: 800;
+            padding: 0.6rem;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        .btn:hover {
+            background-color: var(--ruffle-yellow-hover);
+        }
+
+        /* Fullscreen Player Overlay */
+        .fullscreen-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            z-index: 9999;
+            flex-direction: column;
+        }
+
+        .overlay-bar {
+            background: var(--header-bg);
+            padding: 0.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--ruffle-yellow);
+        }
+
+        .overlay-title {
+            color: var(--ruffle-yellow);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .close-btn {
+            background: var(--ruffle-yellow);
+            color: #0a2472;
+            border: 2px solid var(--ruffle-yellow);
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .close-btn:hover {
+            background-color: var(--ruffle-yellow-hover);
+        }
+
+        .iframe-container {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        #loading {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--ruffle-yellow);
+            grid-column: 1 / -1;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>All Games</h1>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search games..." onkeyup="filterGames()">
+        </div>
+    </header>
+
+    <main>
+        <div class="grid" id="gamesGrid">
+            <div id="loading">Loading games list...</div>
+        </div>
+    </main>
+
+    <div class="fullscreen-overlay" id="playerOverlay">
+        <div class="overlay-bar">
+            <span class="overlay-title" id="overlayTitle"></span>
+            <button class="close-btn" onclick="closePlayer()">Close Game</button>
+        </div>
+        <div class="iframe-container" id="iframeContainer"></div>
+    </div>
+
+    <script>
+        const BASE_VERCEL = "https://html-games-v3.vercel.app";
+        const GITHUB_REPO_API = "https://api.github.com/repos/txandy1010-commits/HTML-Games-v3/contents";
+        const RAW_GITHUB_BASE = "https://raw.githubusercontent.com/txandy1010-commits/HTML-Games-v3/main";
+
+        let allGames = [];
+
+        async function fetchRepoGames() {
+            try {
+                const response = await fetch(GITHUB_REPO_API);
+                const items = await response.json();
+
+                if (!Array.isArray(items)) {
+                    throw new Error("Failed to fetch repository contents");
+                }
+
+                const gameFolders = items.filter(item => item.type === 'dir');
+
+                allGames = gameFolders.map(folder => {
+                    const gameName = folder.name;
+                    const targetUrl = `${BASE_VERCEL}/${folder.name}/index.html`;
+                    const iconUrl = `${RAW_GITHUB_BASE}/${folder.name}/favicon.ico`;
+
+                    return {
+                        name: gameName,
+                        url: targetUrl,
+                        logo: iconUrl
+                    };
+                });
+
+                renderGames(allGames);
+            } catch (err) {
+                document.getElementById('gamesGrid').innerHTML = `<p id="loading">Error loading games. Please check back later.</p>`;
+            }
+        }
+
+        function renderGames(list) {
+            const grid = document.getElementById('gamesGrid');
+            grid.innerHTML = "";
+
+            if (list.length === 0) {
+                grid.innerHTML = `<p id="loading">No games found.</p>`;
+                return;
+            }
+
+            list.forEach(game => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.onclick = () => openPlayer(game.name, game.url);
+
+                card.innerHTML = `
+                    <img src="${game.logo}" class="game-logo" alt="${game.name}" onerror="this.src='https://ruffle.rs/favicon.ico'">
+                    <div class="card-title">${game.name}</div>
+                    <button class="btn">Play</button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function openPlayer(title, targetUrl) {
+            document.getElementById('overlayTitle').innerText = title;
+            document.getElementById('iframeContainer').innerHTML = `<iframe src="${targetUrl}" allowfullscreen="true"></iframe>`;
+            document.getElementById('playerOverlay').style.display = 'flex';
+        }
+
+        function closePlayer() {
+            document.getElementById('playerOverlay').style.display = 'none';
+            document.getElementById('iframeContainer').innerHTML = '';
+        }
+
+        function filterGames() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allGames.filter(g => g.name.toLowerCase().includes(query));
+            renderGames(filtered);
+        }
+
+        fetchRepoGames();
+    </script>
+</body>
+</html>
