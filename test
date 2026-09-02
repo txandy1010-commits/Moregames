@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apex Learning Hub | Study & Reference Portal</title>
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --secondary: #3b82f6;
+      --bg: #f8fafc;
+      --text: #1e293b;
+      --card-bg: #ffffff;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: var(--primary);
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      letter-spacing: 0.5px;
+    }
+
+    nav a {
+      color: #e2e8f0;
+      text-decoration: none;
+      margin-left: 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    nav a:hover {
+      color: white;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+
+    .hero h2 {
+      margin-top: 0;
+      font-size: 2rem;
+    }
+
+    .hero p {
+      max-width: 600px;
+      margin: 0.5rem auto 0;
+      opacity: 0.9;
+    }
+
+    main {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      flex: 1;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 8px;
+      padding: 1.5rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .card h3 {
+      margin-top: 0;
+      color: var(--primary);
+    }
+
+    footer {
+      background-color: #0f172a;
+      color: #94a3b8;
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 0.85rem;
+      margin-top: auto;
+    }
+
+    footer a {
+      color: #64748b;
+      text-decoration: none;
+      margin: 0 0.5rem;
+    }
+
+    /* Secret Link Styling */
+    .secret-trigger {
+      cursor: pointer;
+      color: inherit;
+      text-decoration: none;
+      user-select: none;
+    }
+
+    /* Hidden Games Panel */
+    #gamesOverlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0f172a;
+      color: white;
+      z-index: 9999;
+      padding: 2rem;
+      box-sizing: border-box;
+      overflow-y: auto;
+    }
+
+    .overlay-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .close-btn {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .game-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+
+    .game-card h4 {
+      margin: 0 0 0.5rem 0;
+      color: #38bdf8;
+    }
+
+    .game-card p {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      margin-bottom: 1rem;
+    }
+
+    .play-btn {
+      display: inline-block;
+      background: #0284c7;
+      color: white;
+      padding: 0.4rem 1rem;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Apex Learning Hub</h1>
+    <nav>
+      <a href="#">Dashboard</a>
+      <a href="#">Courses</a>
+      <a href="#">Reference Tools</a>
+      <a href="#">Library</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h2>Interactive Study Modules</h2>
+    <p>Access high-yield study guides, practice sets, and reference materials across STEM and humanities.</p>
+  </section>
+
+  <main>
+    <div class="grid">
+      <div class="card">
+        <h3>Calculus II: Integration Techniques</h3>
+        <p>Review standard substitution rules, integration by parts, and trigonometric substitutions with practice problem sets.</p>
+      </div>
+
+      <div class="card">
+        <h3>Organic Chemistry Fundamentals</h3>
+        <p>Interactive guides on functional groups, stereochemistry, reaction mechanisms, and nomenclature rules.</p>
+      </div>
+
+      <div class="card">
+        <h3>World History Timeline</h3>
+        <p>Comprehensive historical event maps covering early civilizations through late modern industrial developments.</p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>
+      <a href="#">Privacy Policy</a> | 
+      <a href="#">Terms of Service</a> | 
+      <a href="#">Accessibility</a>
+    </p>
+    <p>
+      &copy; 2026 Apex Academic Network. All rights reserved<span class="secret-trigger" onclick="toggleGames()">.</span>
+    </p>
+  </footer>
+
+  <div id="gamesOverlay">
+    <div class="overlay-header">
+      <h2>Arcade Vault</h2>
+      <button class="close-btn" onclick="toggleGames()">Return to Study Mode</button>
+    </div>
+    <div class="game-grid">
+      <div class="game-card">
+        <h4>Snake</h4>
+        <p>Classic arcade snake game.</p>
+        <a href="https://playsnake.org" target="_blank" class="play-btn">Play Now</a>
+      </div>
+      <div class="game-card">
+        <h4>2048</h4>
+        <p>Slide matching tiles to reach 2048.</p>
+        <a href="https://play2048.co" target="_blank" class="play-btn">Play Now</a>
+      </div>
+      <div class="game-card">
+        <h4>Tetris</h4>
+        <p>Classic tile-matching puzzle game.</p>
+        <a href="https://tetris.com/play-tetris" target="_blank" class="play-btn">Play Now</a>
+      </div>
+      <div class="game-card">
+        <h4>Chess</h4>
+        <p>Practice board strategies online.</p>
+        <a href="https://www.chess.com" target="_blank" class="play-btn">Play Now</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleGames() {
+      const overlay = document.getElementById('gamesOverlay');
+      if (overlay.style.display === 'block') {
+        overlay.style.display = 'none';
+      } else {
+        overlay.style.display = 'block';
+      }
+    }
+  </script>
+
+</body>
+</html>
